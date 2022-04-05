@@ -47,4 +47,4 @@ To start things off we are just using:
 
 ## Pull Requests
 
-[^1]: [Class 08 Pull Request](https://github.com/AndresMillsGallego/auth-api/pull/1)
+[^1]: [Class 11 Pull Request](https://github.com/AndresMillsGallego/caps-hub/pull/2)
