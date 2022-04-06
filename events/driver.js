@@ -1,10 +1,17 @@
 'use strict';
 
-const eventEmitter = require('../event-emitter');
+const { io } = require('socket.io-client');
+const socket = io('http://localhost:3000/caps');
 
-module.exports = (payload) => {
+socket.on('pickup', (payload) => {
   console.log(`DRIVER: picked up ${payload.orderId}`);
-  eventEmitter.emit('in transit', payload);
-  eventEmitter.emit('delivered', payload);
-};
+  socket.emit('in-transit', payload);
+  console.log(`DRIVER: delivered ${payload.orderId}`);
+  socket.emit('delivered', payload);
+});
+
+
+
+
+
 
