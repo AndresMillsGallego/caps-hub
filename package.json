@@ -1,0 +1,24 @@
+{
+  "name": "caps-hub",
+  "version": "1.0.0",
+  "description": "**Lab 11**",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --verbose --coverage",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AndresMillsGallego/caps-hub.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AndresMillsGallego/caps-hub/issues"
+  },
+  "homepage": "https://github.com/AndresMillsGallego/caps-hub#readme",
+  "dependencies": {
+    "dotenv": "^16.0.0"
+  }
+}
