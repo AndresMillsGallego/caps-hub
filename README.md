@@ -58,4 +58,4 @@ To start things off we are just using:
 
 [^1]: [Class 11 Pull Request](https://github.com/AndresMillsGallego/caps-hub/pull/2)
 
-[^2]: [Class 12 Pull Request]()
+[^2]: [Class 12 Pull Request](https://github.com/AndresMillsGallego/caps-hub/pull/3)
