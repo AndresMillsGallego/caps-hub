@@ -15,8 +15,9 @@ Lab 12[^2]
 
 [GitHub Repo](https://github.com/AndresMillsGallego/caps-hub)
 
-![Class 11 UML](./class-11-uml.png)
-![Class 12 UML](./class-12-uml.png)
+![Class 11 UML](./assets/class-11-uml.png)
+![Class 12 UML](./assets/class-12-uml.png)
+![Class 13 UML](./assets/class-13-uml.png)
 
 ## Installation
 

@@ -19,6 +19,8 @@
   },
   "homepage": "https://github.com/AndresMillsGallego/caps-hub#readme",
   "dependencies": {
-    "dotenv": "^16.0.0"
+    "dotenv": "^16.0.0",
+    "jest": "^27.5.1",
+    "socket.io-client": "^4.4.1"
   }
 }

@@ -3,6 +3,9 @@
 const { io } = require('socket.io-client');
 const socket = io('http://localhost:3000/caps');
 
+const MessageClient = require('./message-client');
+const messageQueue = new MessageClient('messages');
+
 socket.on('pickup', (payload) => {
   console.log(`DRIVER: picked up ${payload.orderId}`);
   socket.emit('in-transit', payload);
