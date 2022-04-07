@@ -1,0 +1,14 @@
+{
+  "name": "lib",
+  "version": "1.0.0",
+  "description": "",
+  "main": "message-queue.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "messenger": "node messenger.js",
+    "recipient": "node recipient.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

@@ -7,36 +7,79 @@ const PORT = process.env.PORT || 3001;
 
 const server = new Server(PORT);
 const caps = server.of('/caps');
-const eventLogger = require('./events/log-event');
+const eventLogger = require('./logger/log-event');
+const Queue = require('./lib/queue');
+const messageQueue = new Queue();
 
-
-server.on('connection', (socket) => {
-  console.log('First socket is a go go go!!' + socket.id);
-});
+const driverQueue = new Queue();
+const vendorQueue = new Queue();
 
 caps.on('connection', (socket) => {
   console.log('Successful connection made to CAPS namespace!', socket.id);
   
-  socket.on('join', (payload) => {
-    socket.join(payload.vendorId);
+  socket.onAny((event, payload) => {
+    let timeStamp = Date(Date.now).toString();
+    console.log('EVENT: ' + event);
+    console.log('TIMESTAMP: ' + timeStamp);
+    console.log(payload);
   });
 
-  socket.on('order', (payload) => {
-    socket.to(payload.vendorId).emit(payload);
+  socket.on('join', ({ queueId }) => {
+    socket.join(queueId);
+    socket.emit('join', queueId);
+  });
+
+  socket.on('message', (payload) => {
+    let currentQueue = messageQueue.read(payload.queueId);
+    if (!currentQueue) {
+      let queueKey = messageQueue.store(payload.queueId, new Queue());
+      currentQueue = messageQueue.read(queueKey);
+    }
+    currentQueue.store(payload.messageId, payload);
+    caps.emit('message', payload);
+  });
+
+  socket.on('received', (payload) => {
+    let currentQueue = driverQueue.read(payload.queueId);
+    if (!currentQueue) {
+      throw new Error('No queue found');
+    }
+    let message = currentQueue.remove(payload.messageId);
+    caps.emit('received', message);
   });
 
   socket.on('pickup', (payload) => {
-    eventLogger('pickup', payload);
-    socket.broadcast.emit('pickup', payload);
+    let currentQueue = driverQueue.read(payload.queueId);
+    if (!currentQueue) {
+      let queueKey = driverQueue.store(payload.queueId, new Queue());
+      currentQueue = driverQueue.read(queueKey);
+    }
+    currentQueue.store(payload.messageId, payload);
+    caps.emit('pickup', payload);
+    // eventLogger('pickup', payload);
   });
+
+  socket.on('getAll', (payload) => {
+    let currentQueue = driverQueue.read(payload.queueId);
+    Object.keys(currentQueue.data).forEach(messageId => {
+      caps.emit('pickup', currentQueue.read(messageId));
+    });
+  });
+
   
   socket.on('in-transit', (payload) => {
-    eventLogger('in transit', payload);
-    socket.broadcast.emit('in-transit', payload);
+    // eventLogger('in transit', payload);
+    caps.emit('in-transit', payload);
   });
 
   socket.on('delivered', (payload) => {
-    eventLogger('delivered', payload);
-    socket.broadcast.emit('delivered', payload);
+    let currentQueue = vendorQueue.read(payload.queueId);
+    if (!currentQueue) {
+      let queueKey = vendorQueue.store(payload.queueId, new Queue());
+      currentQueue = vendorQueue.read(queueKey);
+    }
+    currentQueue.store(payload.messageId, payload);
+    caps.emit('delivered', payload);
   });
+
 });
