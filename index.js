@@ -18,7 +18,9 @@ caps.on('connection', (socket) => {
   console.log('Successful connection made to CAPS namespace!', socket.id);
   
   socket.onAny((event, payload) => {
+    let timeStamp = Date(Date.now).toString();
     console.log('EVENT: ' + event);
+    console.log('TIMESTAMP: ' + timeStamp);
     console.log(payload);
   });
 
@@ -38,7 +40,7 @@ caps.on('connection', (socket) => {
   });
 
   socket.on('received', (payload) => {
-    let currentQueue = messageQueue.read(payload.queueId);
+    let currentQueue = driverQueue.read(payload.queueId);
     if (!currentQueue) {
       throw new Error('No queue found');
     }
@@ -46,25 +48,37 @@ caps.on('connection', (socket) => {
     caps.emit('received', message);
   });
 
+  socket.on('pickup', (payload) => {
+    let currentQueue = driverQueue.read(payload.queueId);
+    if (!currentQueue) {
+      let queueKey = driverQueue.store(payload.queueId, new Queue());
+      currentQueue = driverQueue.read(queueKey);
+    }
+    currentQueue.store(payload.messageId, payload);
+    caps.emit('pickup', payload);
+    // eventLogger('pickup', payload);
+  });
+
   socket.on('getAll', (payload) => {
-    let currentQueue = messageQueue.read(payload.queueId);
+    let currentQueue = driverQueue.read(payload.queueId);
     Object.keys(currentQueue.data).forEach(messageId => {
-      caps.emit('message', currentQueue.read(messageId));
+      caps.emit('pickup', currentQueue.read(messageId));
     });
   });
 
-  socket.on('pickup', (payload) => {
-    eventLogger('pickup', payload);
-    caps.emit('pickup', payload);
-  });
   
   socket.on('in-transit', (payload) => {
-    eventLogger('in transit', payload);
+    // eventLogger('in transit', payload);
     caps.emit('in-transit', payload);
   });
 
   socket.on('delivered', (payload) => {
-    eventLogger('delivered', payload);
+    let currentQueue = vendorQueue.read(payload.queueId);
+    if (!currentQueue) {
+      let queueKey = vendorQueue.store(payload.queueId, new Queue());
+      currentQueue = vendorQueue.read(queueKey);
+    }
+    currentQueue.store(payload.messageId, payload);
     caps.emit('delivered', payload);
   });
 
