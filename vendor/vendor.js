@@ -9,7 +9,7 @@ const driverQueue = new MessageClient('Acme Widgets');
 function createOrder(storeName) {
   let id = Math.floor(Math.random() * 1000);
   const payload = {
-    store: storeName,
+    vendorId: storeName,
     orderId: id,
     customer: 'Aureliano Buendia',
     address: '1234 5th St Seattle, Wa',
@@ -19,7 +19,7 @@ function createOrder(storeName) {
 let payload = createOrder('Acme Widgets');
 let randomId = Math.floor(Math.random() * 1000);
 
-driverQueue.publish('getAll', { queueId: driverQueue.queueId });
+driverQueue.publish('getAll', { vendorId: 'Acme Widgets', event: 'delivered' });
 
 driverQueue.publish('pickup', { messageId: randomId, ...payload });
 driverQueue.subscribe('received', console.log);
