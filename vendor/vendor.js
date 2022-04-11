@@ -24,19 +24,12 @@ driverQueue.publish('getAll', { vendorId: 'Acme Widgets', event: 'delivered' });
 driverQueue.publish('pickup', { messageId: randomId, ...payload });
 driverQueue.subscribe('received', console.log);
 driverQueue.subscribe('delivered', (payload) => {
+  driverQueue.publish('received', {
+    event: 'delivered',
+    vendorId: payload.vendorId,
+    orderId: payload.orderId,
+  });
   console.log('Thank you for your order.');
 });
 
-
-
-
-// setInterval(() => {
-//   const payload = createOrder('Rocket Pizza');
-//   socket.emit('pickup', payload);
-// }, 5000);
-
-// socket.on('delivered', (payload) => {
-//   console.log(`Thank you, ${payload.customer}`);
-//   process.exit();
-// });
 

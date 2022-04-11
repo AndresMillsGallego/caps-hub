@@ -40,10 +40,12 @@ caps.on('connection', (socket) => {
     }
 
     let vendorQueue = currentQueue.read(vendorId);
-    Object.keys(vendorQueue.data).forEach(orderId => {
-      let order = vendorQueue.read(orderId);
-      socket.emit(event, order);
-    });
+    if (vendorQueue) {
+      Object.keys(vendorQueue.data).forEach(orderId => {
+        let order = vendorQueue.read(orderId);
+        socket.emit(event, order);
+      });
+    }
   });
 
   socket.on('pickup', (payload) => {
@@ -57,7 +59,7 @@ caps.on('connection', (socket) => {
     // eventLogger('pickup', payload);
   });
 
-  socket.on('received', ({ event, order }) => {
+  socket.on('received', ({ event, orderId, vendorId }) => {
     let currentQueue;
     if (event === 'delivered') {
       currentQueue = deliveredQueue;
@@ -66,8 +68,8 @@ caps.on('connection', (socket) => {
     } else {
       console.log('No queue found!');
     }
-    let vendorQueue = currentQueue.read(order.vendorId);
-    let removedOrder = vendorQueue.remove(order.orderId);
+    let vendorQueue = currentQueue.read(vendorId);
+    let removedOrder = vendorQueue.remove(orderId);
     caps.emit('received', removedOrder);
   });
 
