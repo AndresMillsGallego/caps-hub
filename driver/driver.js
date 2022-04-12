@@ -25,12 +25,12 @@ widgetQueue.subscribe('pickup', (payload) => {
 flowerQueue.publish('getAll', { vendorId: '1-800-flowers', event: 'delivered' });
 
 flowerQueue.subscribe('pickup', (payload) => {
+  flowerQueue.publish('in-transit', payload);
   flowerQueue.publish('received', {
     event: 'pickup',
     vendorId: payload.vendorId,
     orderId: payload.orderId,
   });
-  flowerQueue.publish('in-transit', payload);
   setTimeout(() => {
     flowerQueue.publish('delivered', payload);
   }, 2000);

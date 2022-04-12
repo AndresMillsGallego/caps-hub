@@ -47,17 +47,17 @@ caps.on('connection', (socket) => {
   });
 
   socket.on('pickup', (payload) => {
-    let currentQueue = pickupQueue.read(payload.queueId);
+    let currentQueue = pickupQueue.read(payload.vendorId);
     if (!currentQueue) {
-      let queueKey = pickupQueue.store(payload.queueId, new Queue());
+      let queueKey = pickupQueue.store(payload.vendorId, new Queue());
       currentQueue = pickupQueue.read(queueKey);
     }
     currentQueue.store(payload.orderId, payload);
-    caps.emit('pickup', payload);
+    socket.broadcast.emit('pickup', payload);
   });
 
   socket.on('received', ({ event, orderId, vendorId }) => {
-    let currentQueue;
+    let currentQueue = null;
     if (event === 'delivered') {
       currentQueue = deliveredQueue;
     } else if (event === 'pickup') {
@@ -67,10 +67,11 @@ caps.on('connection', (socket) => {
     }
     let vendorQueue = currentQueue.read(vendorId);
     let removedOrder = vendorQueue.remove(orderId);
-    caps.emit('received', removedOrder);
+    socket.broadcast.emit('received', removedOrder);
   });
 
   socket.on('in-transit', (payload) => {
+    console.log('Order in Transit ', payload);
     caps.emit('in-transit', payload);
   });
   
@@ -81,7 +82,7 @@ caps.on('connection', (socket) => {
       currentQueue = deliveredQueue.read(queueKey);
     }
     currentQueue.store(payload.orderId, payload);
-    caps.emit('delivered', payload);
+    socket.broadcast.emit('delivered', payload);
   });
 
 });

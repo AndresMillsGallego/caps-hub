@@ -22,26 +22,24 @@ function getRandomNumber() {
 widgetQueue.publish('getAll', { vendorId: 'Acme Widgets', event: 'delivered' });
 
 widgetQueue.publish('pickup', { messageId: getRandomNumber(), ...createOrder('Acme Widgets') });
-widgetQueue.subscribe('received', console.log);
 widgetQueue.subscribe('delivered', (payload) => {
+  console.log(`Thank you for delivering ${payload.orderId}`);
   widgetQueue.publish('received', {
     event: 'delivered',
     vendorId: payload.vendorId,
     orderId: payload.orderId,
   });
-  console.log('Thank you for your order.');
 });
 
 widgetQueue.publish('getAll', { vendorId: '1-800-flowers', event: 'delivered' });
 
 flowerQueue.publish('pickup', { messageId: getRandomNumber(), ...createOrder('1-800-flowers') });
-flowerQueue.subscribe('received', console.log);
 flowerQueue.subscribe('delivered', (payload) => {
+  console.log(`Thank you for delivering ${payload.orderId}`);
   flowerQueue.publish('received', {
     event: 'delivered',
     vendorId: payload.vendorId,
     orderId: payload.orderId,
   });
-  console.log('Thank you for your order.');
 });
 
