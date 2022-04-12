@@ -7,9 +7,7 @@ const PORT = process.env.PORT || 3001;
 
 const server = new Server(PORT);
 const caps = server.of('/caps');
-const eventLogger = require('./logger/log-event');
 const Queue = require('./lib/queue');
-const messageQueue = new Queue();
 
 const pickupQueue = new Queue();
 const deliveredQueue = new Queue();
@@ -56,7 +54,6 @@ caps.on('connection', (socket) => {
     }
     currentQueue.store(payload.orderId, payload);
     caps.emit('pickup', payload);
-    // eventLogger('pickup', payload);
   });
 
   socket.on('received', ({ event, orderId, vendorId }) => {
@@ -74,7 +71,6 @@ caps.on('connection', (socket) => {
   });
 
   socket.on('in-transit', (payload) => {
-    // eventLogger('in transit', payload);
     caps.emit('in-transit', payload);
   });
   
@@ -89,14 +85,3 @@ caps.on('connection', (socket) => {
   });
 
 });
-
-
-// socket.on('message', (payload) => {
-//   let currentQueue = messageQueue.read(payload.queueId);
-//   if (!currentQueue) {
-//     let queueKey = messageQueue.store(payload.queueId, new Queue());
-//     currentQueue = messageQueue.read(queueKey);
-//   }
-//   currentQueue.store(payload.messageId, payload);
-//   caps.emit('message', payload);
-// });

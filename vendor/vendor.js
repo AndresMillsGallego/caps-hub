@@ -1,10 +1,8 @@
 'use strict';
 
-// const { io } = require('socket.io-client');
-// const socket = io('http://localhost:3000/caps');
-
 const MessageClient = require('../lib/message-client');
-const driverQueue = new MessageClient('Acme Widgets');
+const widgetQueue = new MessageClient('Acme Widgets');
+const flowerQueue = new MessageClient('1-800-flowers');
 
 function createOrder(storeName) {
   let id = Math.floor(Math.random() * 1000);
@@ -16,15 +14,17 @@ function createOrder(storeName) {
   };
   return payload;
 }
-let payload = createOrder('Acme Widgets');
-let randomId = Math.floor(Math.random() * 1000);
 
-driverQueue.publish('getAll', { vendorId: 'Acme Widgets', event: 'delivered' });
+function getRandomNumber() {
+  return Math.floor(Math.random() * 1000);
+}
 
-driverQueue.publish('pickup', { messageId: randomId, ...payload });
-driverQueue.subscribe('received', console.log);
-driverQueue.subscribe('delivered', (payload) => {
-  driverQueue.publish('received', {
+widgetQueue.publish('getAll', { vendorId: 'Acme Widgets', event: 'delivered' });
+
+widgetQueue.publish('pickup', { messageId: getRandomNumber(), ...createOrder('Acme Widgets') });
+widgetQueue.subscribe('received', console.log);
+widgetQueue.subscribe('delivered', (payload) => {
+  widgetQueue.publish('received', {
     event: 'delivered',
     vendorId: payload.vendorId,
     orderId: payload.orderId,
@@ -32,4 +32,16 @@ driverQueue.subscribe('delivered', (payload) => {
   console.log('Thank you for your order.');
 });
 
+widgetQueue.publish('getAll', { vendorId: '1-800-flowers', event: 'delivered' });
+
+flowerQueue.publish('pickup', { messageId: getRandomNumber(), ...createOrder('1-800-flowers') });
+flowerQueue.subscribe('received', console.log);
+flowerQueue.subscribe('delivered', (payload) => {
+  flowerQueue.publish('received', {
+    event: 'delivered',
+    vendorId: payload.vendorId,
+    orderId: payload.orderId,
+  });
+  console.log('Thank you for your order.');
+});
 

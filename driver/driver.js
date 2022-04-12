@@ -4,24 +4,37 @@ const { io } = require('socket.io-client');
 const socket = io('http://localhost:3000/caps');
 
 const MessageClient = require('../lib/message-client');
-const driverQueue = new MessageClient('Acme Widgets');
+const widgetQueue = new MessageClient('Acme Widgets');
+const flowerQueue = new MessageClient('1-800-flowers');
 
 
-socket.emit('getAll', { vendorId: 'Acme Widgets', event: 'pickup' });
+widgetQueue.publish('getAll', { vendorId: 'Acme Widgets', event: 'delivered' });
 
-driverQueue.subscribe('pickup', (payload) => {
-  driverQueue.publish('received', {
+widgetQueue.subscribe('pickup', (payload) => {
+  widgetQueue.publish('received', {
     event: 'pickup',
     vendorId: payload.vendorId,
     orderId: payload.orderId,
   });
-  driverQueue.publish('in-transit', payload);
+  widgetQueue.publish('in-transit', payload);
   setTimeout(() => {
-    driverQueue.publish('delivered', payload);
+    widgetQueue.publish('delivered', payload);
   }, 2000);
 });
 
+flowerQueue.publish('getAll', { vendorId: '1-800-flowers', event: 'delivered' });
 
+flowerQueue.subscribe('pickup', (payload) => {
+  flowerQueue.publish('received', {
+    event: 'pickup',
+    vendorId: payload.vendorId,
+    orderId: payload.orderId,
+  });
+  flowerQueue.publish('in-transit', payload);
+  setTimeout(() => {
+    flowerQueue.publish('delivered', payload);
+  }, 2000);
+});
 
 socket.on('pickup', (payload) => {
   console.log(`DRIVER: picked up ${payload.orderId}`);
