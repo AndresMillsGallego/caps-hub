@@ -53,7 +53,7 @@ caps.on('connection', (socket) => {
       currentQueue = pickupQueue.read(queueKey);
     }
     currentQueue.store(payload.orderId, payload);
-    socket.broadcast.emit('pickup', payload);
+    socket.to(payload.vendorId).emit('pickup', payload);
   });
 
   socket.on('received', ({ event, orderId, vendorId }) => {
@@ -67,7 +67,7 @@ caps.on('connection', (socket) => {
     }
     let vendorQueue = currentQueue.read(vendorId);
     let removedOrder = vendorQueue.remove(orderId);
-    socket.broadcast.emit('received', removedOrder);
+    socket.to(vendorId).emit('received', removedOrder);
   });
 
   socket.on('in-transit', (payload) => {
@@ -76,13 +76,13 @@ caps.on('connection', (socket) => {
   });
   
   socket.on('delivered', (payload) => {
-    let currentQueue = deliveredQueue.read(payload.queueId);
+    let currentQueue = deliveredQueue.read(payload.vendorId);
     if (!currentQueue) {
-      let queueKey = deliveredQueue.store(payload.queueId, new Queue());
+      let queueKey = deliveredQueue.store(payload.vendorId, new Queue());
       currentQueue = deliveredQueue.read(queueKey);
     }
     currentQueue.store(payload.orderId, payload);
-    socket.broadcast.emit('delivered', payload);
+    socket.to(payload.vendorId).emit('delivered', payload);
   });
 
 });
