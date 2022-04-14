@@ -70,4 +70,4 @@ To start things off we are just using:
 
 [^2]: [Class 12 Pull Request](https://github.com/AndresMillsGallego/caps-hub/pull/3)
 
-[^3]: [Class 13 Pull Request]()
+[^3]: [Class 13 Pull Request](https://github.com/AndresMillsGallego/caps-hub/pull/5)
